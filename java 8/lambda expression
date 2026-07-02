@@ -1199,3 +1199,869 @@ Try these **without looking at the answers**:
 10. Check whether a string is a palindrome.
 
 These exercises will make you comfortable with lambda syntax before moving on to Java 8's built-in functional interfaces like `Predicate`, `Function`, `Consumer`, and `Supplier`.
+
+
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Excellent! This is the **complete Module 1**. I'll teach it exactly the way interviewers expect, but in a beginner-friendly way.
+
+---
+
+# Module 1 – Lambda Expressions (Complete Notes)
+
+---
+
+# 1. What is Lambda?
+
+## Definition (Interview)
+
+A **Lambda Expression** is a concise way to provide the implementation of the **single abstract method** of a **Functional Interface**.
+
+In simple words,
+
+> A Lambda is an **anonymous function (method without a name)** that lets us write the implementation of a functional interface without creating a separate class.
+
+---
+
+## Before Java 8
+
+Suppose we have:
+
+```java
+interface Greeting {
+    void sayHello();
+}
+```
+
+To implement it:
+
+```java
+class GreetingImpl implements Greeting {
+
+    @Override
+    public void sayHello() {
+        System.out.println("Hello");
+    }
+}
+```
+
+Create object
+
+```java
+Greeting g = new GreetingImpl();
+g.sayHello();
+```
+
+Output
+
+```
+Hello
+```
+
+---
+
+## Java 8
+
+```java
+Greeting g = () -> System.out.println("Hello");
+
+g.sayHello();
+```
+
+Output
+
+```
+Hello
+```
+
+Notice how much code was removed.
+
+---
+
+# Real Meaning
+
+A Lambda is **not a method call**.
+
+It is **only the implementation of a method**.
+
+Think of it like this:
+
+```text
+Interface
+
+↓
+
+Method Declaration
+
+↓
+
+Lambda
+
+↓
+
+Method Implementation
+```
+
+---
+
+# 2. Why Lambda?
+
+This is one of the most asked interview questions.
+
+---
+
+## Problem Before Java 8
+
+Suppose we wanted to compare two numbers.
+
+We had to create
+
+```
+Interface
+
+↓
+
+Class
+
+↓
+
+Override Method
+
+↓
+
+Object
+
+↓
+
+Call Method
+```
+
+Even for one line of code.
+
+Example
+
+```java
+Comparator<Integer> c = new Comparator<Integer>() {
+
+    @Override
+    public int compare(Integer a, Integer b) {
+
+        return a - b;
+
+    }
+
+};
+```
+
+Very lengthy.
+
+---
+
+## Java 8
+
+```java
+Comparator<Integer> c = (a, b) -> a - b;
+```
+
+Same work.
+
+Only one line.
+
+---
+
+## Advantages of Lambda
+
+### 1. Less Code
+
+Old Java
+
+```java
+new Runnable() {
+
+    @Override
+    public void run() {
+
+        System.out.println("Running");
+
+    }
+
+};
+```
+
+Lambda
+
+```java
+() -> System.out.println("Running");
+```
+
+---
+
+### 2. Easy to Read
+
+Less boilerplate.
+
+Cleaner code.
+
+---
+
+### 3. Supports Functional Programming
+
+Instead of passing objects,
+
+you pass behavior.
+
+Example
+
+```java
+list.forEach(name -> System.out.println(name));
+```
+
+---
+
+### 4. Used Everywhere
+
+* Stream API
+* Collections
+* Sorting
+* Threading
+* Event Handling
+
+---
+
+# Interview Answer
+
+**Why was Lambda introduced?**
+
+> Lambda Expressions were introduced to reduce boilerplate code, improve readability, support functional programming, and simplify the implementation of functional interfaces.
+
+---
+
+# 3. Lambda Syntax
+
+General syntax
+
+```java
+(parameters) -> expression
+```
+
+or
+
+```java
+(parameters) -> {
+
+    statements;
+
+}
+```
+
+---
+
+Think of it as
+
+```
+Input
+
+↓
+
+Process
+
+↓
+
+Output
+```
+
+The arrow
+
+```text
+->
+```
+
+means
+
+```
+takes input
+
+↓
+
+returns output
+```
+
+---
+
+# Different Syntax
+
+---
+
+## No Parameter
+
+```java
+() -> System.out.println("Hello");
+```
+
+Equivalent
+
+```java
+void greet() {
+
+    System.out.println("Hello");
+
+}
+```
+
+---
+
+## One Parameter
+
+```java
+name -> System.out.println(name);
+```
+
+Equivalent
+
+```java
+void print(String name) {
+
+    System.out.println(name);
+
+}
+```
+
+---
+
+## Two Parameters
+
+```java
+(a, b) -> a + b;
+```
+
+Equivalent
+
+```java
+int add(int a, int b) {
+
+    return a + b;
+
+}
+```
+
+---
+
+# Why No Return?
+
+Suppose
+
+```java
+(a, b) -> a + b
+```
+
+Many beginners ask
+
+> Where is return?
+
+Java automatically adds
+
+```java
+return
+```
+
+Internally
+
+```java
+(a, b) -> {
+
+    return a + b;
+
+}
+```
+
+---
+
+If you use braces
+
+```java
+(a, b) -> {
+
+    return a + b;
+
+}
+```
+
+Return becomes compulsory.
+
+---
+
+# 4. Functional Interface
+
+This is the heart of Lambda.
+
+Without Functional Interface,
+
+Lambda cannot exist.
+
+---
+
+## Definition
+
+A Functional Interface is an interface that contains **exactly one abstract method**.
+
+Example
+
+```java
+interface Calculator {
+
+    int add(int a, int b);
+
+}
+```
+
+Only one abstract method.
+
+So
+
+Lambda works.
+
+```java
+Calculator c = (a, b) -> a + b;
+```
+
+---
+
+## Not Functional Interface
+
+```java
+interface Test {
+
+    void print();
+
+    void show();
+
+}
+```
+
+Now Lambda
+
+```java
+Test t = () -> System.out.println("Hello");
+```
+
+Compilation Error.
+
+---
+
+## Why?
+
+Java gets confused.
+
+```
+Should I implement
+
+print()
+
+OR
+
+show()?
+```
+
+No answer.
+
+Hence,
+
+only one abstract method.
+
+---
+
+## @FunctionalInterface
+
+Java provides an annotation.
+
+```java
+@FunctionalInterface
+interface Calculator {
+
+    int add(int a, int b);
+
+}
+```
+
+---
+
+If someone later adds another abstract method
+
+```java
+void subtract();
+```
+
+Compiler immediately gives an error.
+
+This protects the interface.
+
+---
+
+# Interview Answer
+
+**What is Functional Interface?**
+
+> A Functional Interface is an interface with exactly one abstract method. Lambda expressions provide the implementation for that single abstract method.
+
+---
+
+# 5. How Java Executes Lambda
+
+This is the most important concept.
+
+---
+
+Suppose
+
+```java
+interface Calculator {
+
+    int add(int a, int b);
+
+}
+```
+
+Lambda
+
+```java
+Calculator c = (a, b) -> a + b;
+```
+
+Many beginners think
+
+```
+Where is the class?
+```
+
+Good question.
+
+---
+
+Java compiler generates an implementation behind the scenes.
+
+Imagine Java creates
+
+```java
+class TempCalculator implements Calculator {
+
+    @Override
+    public int add(int a, int b) {
+
+        return a + b;
+
+    }
+
+}
+```
+
+Then
+
+```java
+Calculator c = new TempCalculator();
+```
+
+You don't see this generated class, but conceptually this is what happens.
+
+---
+
+# Memory Representation
+
+```text
+STACK
+
+c
+
+↓
+
+Reference
+
+-------------------
+
+HEAP
+
+Generated Lambda Object
+
+↓
+
+add()
+
+↓
+
+return a+b
+```
+
+---
+
+When you call
+
+```java
+System.out.println(c.add(5, 3));
+```
+
+Execution
+
+```
+add(5,3)
+
+↓
+
+Lambda executes
+
+↓
+
+returns 8
+
+↓
+
+println()
+
+↓
+
+8
+```
+
+---
+
+# Does Lambda Execute Immediately?
+
+No.
+
+Example
+
+```java
+Calculator c = (a, b) -> a + b;
+```
+
+Nothing happens.
+
+Only implementation created.
+
+Execution begins here
+
+```java
+c.add(5, 3);
+```
+
+---
+
+# 6. Examples
+
+---
+
+## Example 1
+
+```java
+interface Greeting {
+
+    void sayHello();
+
+}
+
+public class Demo {
+
+    public static void main(String[] args) {
+
+        Greeting g = () -> System.out.println("Hello");
+
+        g.sayHello();
+
+    }
+
+}
+```
+
+Output
+
+```
+Hello
+```
+
+---
+
+## Example 2
+
+```java
+interface Square {
+
+    int square(int n);
+
+}
+
+public class Demo {
+
+    public static void main(String[] args) {
+
+        Square s = n -> n * n;
+
+        System.out.println(s.square(5));
+
+    }
+
+}
+```
+
+Output
+
+```
+25
+```
+
+---
+
+## Example 3
+
+```java
+interface Even {
+
+    boolean check(int n);
+
+}
+
+public class Demo {
+
+    public static void main(String[] args) {
+
+        Even e = n -> n % 2 == 0;
+
+        System.out.println(e.check(8));
+
+    }
+
+}
+```
+
+Output
+
+```
+true
+```
+
+---
+
+## Example 4
+
+```java
+interface Message {
+
+    String getMessage();
+
+}
+
+public class Demo {
+
+    public static void main(String[] args) {
+
+        Message m = () -> "Welcome";
+
+        System.out.println(m.getMessage());
+
+    }
+
+}
+```
+
+Output
+
+```
+Welcome
+```
+
+---
+
+# 7. Interview Questions
+
+### Q1. What is Lambda?
+
+**Answer**
+
+A Lambda Expression is a concise way to implement the single abstract method of a functional interface.
+
+---
+
+### Q2. Why was Lambda introduced?
+
+**Answer**
+
+To reduce boilerplate code, improve readability, and support functional programming.
+
+---
+
+### Q3. Can Lambda be used with every interface?
+
+**Answer**
+
+No.
+
+Only Functional Interfaces.
+
+---
+
+### Q4. What is Functional Interface?
+
+**Answer**
+
+An interface containing exactly one abstract method.
+
+---
+
+### Q5. Why must a Functional Interface contain only one abstract method?
+
+**Answer**
+
+Because the compiler must know exactly which method the lambda is implementing. If there are multiple abstract methods, the lambda becomes ambiguous.
+
+---
+
+### Q6. Does Lambda create an object?
+
+**Answer**
+
+Yes. At runtime, Java creates an object representing the lambda implementation, but this is handled internally by the JVM.
+
+---
+
+### Q7. When does a Lambda execute?
+
+**Answer**
+
+A lambda is **not executed when it is created**. It executes only when the functional interface's abstract method is invoked.
+
+Example:
+
+```java
+Greeting g = () -> System.out.println("Hello"); // Creates lambda
+
+g.sayHello(); // Executes lambda
+```
+
+---
+
+### Q8. Can a Lambda access local variables?
+
+**Answer**
+
+Yes, but only if they are **final or effectively final**.
+
+---
+
+# Interview Cheat Sheet
+
+| Question                           | One-Line Answer                                                              |
+| ---------------------------------- | ---------------------------------------------------------------------------- |
+| What is Lambda?                    | A concise implementation of a functional interface's single abstract method. |
+| Why Lambda?                        | To reduce boilerplate code and support functional programming.               |
+| Syntax                             | `(parameters) -> expression`                                                 |
+| Functional Interface               | Interface with exactly one abstract method.                                  |
+| Why only one abstract method?      | To avoid ambiguity about which method the lambda implements.                 |
+| Does Lambda execute immediately?   | No, only when the interface method is called.                                |
+| Can Lambda access local variables? | Yes, if they are final or effectively final.                                 |
+| Does Lambda create its own `this`? | No, it uses the enclosing object's `this`.                                   |
+
+---
+
+## Is this enough for interviews?
+
+For **80–90% of Java interviews**, this module covers the core Lambda concepts. The next essential step is **Module 2 – Functional Interfaces**, where you'll learn `Predicate`, `Function`, `Consumer`, `Supplier`, `UnaryOperator`, and `BinaryOperator`. Those are used extensively with the Stream API and are among the most common Java 8 interview topics.
+
+
