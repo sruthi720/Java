@@ -1,11 +1,3 @@
-IN JAVA 8
----------
-Absolutely. Since you're preparing for **Java Developer (3–4 years)** interviews, I'll teach **Java 8 from scratch to interview level**, assuming you're new to it.
-
-We'll go **topic by topic**, and for every topic we'll follow the same structure.
-
----
-
 # Java 8 Master Roadmap (Interview Preparation)
 
 ## Module 1 — Lambda Expressions ⭐⭐⭐⭐⭐
