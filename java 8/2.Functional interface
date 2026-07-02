@@ -1,0 +1,903 @@
+Excellent! This is **the most important Java 8 topic**. Almost every Java 8 feature (Lambda, Stream API, Method References) is built on **Functional Interfaces**.
+
+If you master this module, **Predicate, Function, Consumer, Supplier** will become very easy.
+
+---
+
+# MODULE 2 – Functional Interfaces ⭐⭐⭐⭐⭐
+
+## Topics
+
+1. What is Functional Interface?
+2. Why do we need Functional Interface?
+3. Rules of Functional Interface
+4. `@FunctionalInterface`
+5. Built-in Functional Interfaces
+
+   * Predicate
+   * Function
+   * Consumer
+   * Supplier
+   * UnaryOperator
+   * BinaryOperator
+6. Real Project Examples
+7. Interview Questions
+
+---
+
+# Part 1 – What is a Functional Interface?
+
+## Definition (Interview)
+
+A **Functional Interface** is an interface that contains **exactly one abstract method**.
+
+It **may contain**:
+
+* One abstract method ✅
+* Any number of default methods ✅
+* Any number of static methods ✅
+
+But it **cannot** contain:
+
+* Two abstract methods ❌
+
+---
+
+## Example
+
+```java
+interface Calculator {
+
+    int add(int a, int b);
+
+}
+```
+
+Question:
+
+How many abstract methods?
+
+```
+add()
+```
+
+Only one.
+
+So this is a Functional Interface.
+
+---
+
+# Why is it called "Functional"?
+
+Because it represents **one function (one behavior).**
+
+Example
+
+```
+Calculator
+
+↓
+
+One Job
+
+↓
+
+add()
+```
+
+Or
+
+```
+Printer
+
+↓
+
+One Job
+
+↓
+
+print()
+```
+
+One interface = One responsibility.
+
+---
+
+# Why Do We Need Functional Interfaces?
+
+Suppose we have
+
+```java
+interface Calculator {
+
+    int add(int a, int b);
+
+}
+```
+
+Now we write
+
+```java
+Calculator c = (a, b) -> a + b;
+```
+
+Question:
+
+How does Java know this lambda belongs to `add()`?
+
+```
+(a,b)->a+b
+
+↓
+
+Which method?
+
+↓
+
+add()
+```
+
+Because there is **only one abstract method.**
+
+Java has no confusion.
+
+---
+
+# What if there are two methods?
+
+```java
+interface Test {
+
+    void print();
+
+    void show();
+
+}
+```
+
+Now
+
+```java
+Test t = () -> System.out.println("Hello");
+```
+
+Compiler says
+
+```
+Which method?
+
+print() ?
+
+OR
+
+show() ?
+```
+
+Impossible.
+
+Compilation Error.
+
+---
+
+# Interview Answer
+
+**Why does Lambda require a Functional Interface?**
+
+**Answer**
+
+Because Java must know exactly which abstract method the lambda is implementing. A Functional Interface has only one abstract method, so there is no ambiguity.
+
+---
+
+# Rules of Functional Interface
+
+## Rule 1
+
+Only one abstract method.
+
+Correct
+
+```java
+interface A {
+
+    void show();
+
+}
+```
+
+---
+
+Wrong
+
+```java
+interface A {
+
+    void show();
+
+    void print();
+
+}
+```
+
+---
+
+## Rule 2
+
+Can have many default methods.
+
+```java
+interface Test {
+
+    void show();
+
+    default void display() {
+
+        System.out.println("Display");
+
+    }
+
+}
+```
+
+Still Functional Interface.
+
+Why?
+
+Because
+
+```
+Abstract Methods = 1
+
+Default Methods = Unlimited
+```
+
+Default methods already have implementation.
+
+---
+
+## Rule 3
+
+Can have static methods.
+
+```java
+interface Test {
+
+    void show();
+
+    static void print() {
+
+        System.out.println("Print");
+
+    }
+
+}
+```
+
+Still Functional Interface.
+
+---
+
+## Rule 4
+
+Methods from `Object` don't count.
+
+Example
+
+```java
+interface Test {
+
+    void show();
+
+    String toString();
+
+}
+```
+
+Still Functional Interface.
+
+Why?
+
+Because `toString()` already exists in `Object`.
+
+---
+
+# @FunctionalInterface
+
+Java provides an annotation.
+
+```java
+@FunctionalInterface
+interface Calculator {
+
+    int add(int a, int b);
+
+}
+```
+
+---
+
+# Why use it?
+
+Suppose your teammate accidentally adds another method.
+
+```java
+@FunctionalInterface
+interface Calculator {
+
+    int add(int a, int b);
+
+    int subtract(int a, int b);
+
+}
+```
+
+Compiler immediately gives an error.
+
+Without the annotation, you might not notice until you try to use the interface with a lambda.
+
+---
+
+# Benefits of @FunctionalInterface
+
+✅ Better readability
+
+✅ Compiler validation
+
+✅ Prevents accidental mistakes
+
+---
+
+# Interview Question
+
+### Is `@FunctionalInterface` mandatory?
+
+Answer
+
+No.
+
+It is optional.
+
+Even without it,
+
+```java
+interface Calculator {
+
+    int add(int a, int b);
+
+}
+```
+
+is still a Functional Interface.
+
+The annotation only tells the compiler to verify that the interface always remains functional.
+
+---
+
+# Built-in Functional Interfaces
+
+Instead of creating
+
+```java
+interface Calculator {
+
+    int add(int a, int b);
+
+}
+```
+
+Java already provides common functional interfaces.
+
+The six most important ones are:
+
+| Interface         | Takes Input | Returns Output | Main Method | Memory Trick                 |
+| ----------------- | ----------- | -------------- | ----------- | ---------------------------- |
+| Predicate<T>      | 1           | Boolean        | `test()`    | Tests something              |
+| Function<T,R>     | 1           | Yes            | `apply()`   | Converts one type to another |
+| Consumer<T>       | 1           | No             | `accept()`  | Consumes data                |
+| Supplier<T>       | 0           | Yes            | `get()`     | Supplies data                |
+| UnaryOperator<T>  | 1           | Same Type      | `apply()`   | Same input and output type   |
+| BinaryOperator<T> | 2           | Same Type      | `apply()`   | Two inputs, same output type |
+
+---
+
+# 1. Predicate
+
+### Meaning
+
+Predicate means
+
+```
+Check
+
+↓
+
+True or False
+```
+
+Always returns
+
+```
+boolean
+```
+
+---
+
+Syntax
+
+```java
+Predicate<Integer> p = n -> n % 2 == 0;
+```
+
+Use
+
+```java
+System.out.println(p.test(10));
+```
+
+Output
+
+```
+true
+```
+
+---
+
+### Logic
+
+```
+10
+
+↓
+
+test()
+
+↓
+
+10 % 2 == 0
+
+↓
+
+true
+```
+
+---
+
+Real Project
+
+```
+Check User Active?
+
+↓
+
+true
+
+Check Age >18?
+
+↓
+
+true
+
+Check Salary >50000?
+
+↓
+
+true
+```
+
+Whenever your answer is **Yes/No**, think **Predicate**.
+
+---
+
+# 2. Function
+
+Function means
+
+```
+Take input
+
+↓
+
+Return another value
+```
+
+Example
+
+```java
+Function<String, Integer> f = str -> str.length();
+```
+
+Use
+
+```java
+System.out.println(f.apply("Java"));
+```
+
+Output
+
+```
+4
+```
+
+---
+
+Logic
+
+```
+Java
+
+↓
+
+length()
+
+↓
+
+4
+```
+
+---
+
+Real Project
+
+```
+Employee
+
+↓
+
+EmployeeDTO
+
+Customer
+
+↓
+
+CustomerDTO
+```
+
+Convert one object into another.
+
+---
+
+# 3. Consumer
+
+Consumer means
+
+```
+Accept
+
+↓
+
+Do work
+
+↓
+
+Return Nothing
+```
+
+Example
+
+```java
+Consumer<String> c = name -> System.out.println(name);
+```
+
+Use
+
+```java
+c.accept("Sruthi");
+```
+
+Output
+
+```
+Sruthi
+```
+
+---
+
+Notice
+
+No return.
+
+Just action.
+
+---
+
+Real Project
+
+```
+Print Log
+
+Save File
+
+Send Email
+
+Display Message
+```
+
+---
+
+# 4. Supplier
+
+Supplier means
+
+```
+No Input
+
+↓
+
+Produces Output
+```
+
+Example
+
+```java
+Supplier<String> s = () -> "Welcome";
+```
+
+Use
+
+```java
+System.out.println(s.get());
+```
+
+Output
+
+```
+Welcome
+```
+
+---
+
+Real Project
+
+```
+Generate OTP
+
+↓
+
+Generate UUID
+
+↓
+
+Current Date
+
+↓
+
+Random Password
+```
+
+---
+
+# 5. UnaryOperator
+
+Unary
+
+```
+One Input
+
+↓
+
+Same Type Output
+```
+
+Example
+
+```java
+UnaryOperator<Integer> u = n -> n * n;
+```
+
+Use
+
+```java
+System.out.println(u.apply(5));
+```
+
+Output
+
+```
+25
+```
+
+Input
+
+```
+Integer
+```
+
+Output
+
+```
+Integer
+```
+
+Same type.
+
+---
+
+# 6. BinaryOperator
+
+Binary
+
+```
+Two Inputs
+
+↓
+
+Same Type Output
+```
+
+Example
+
+```java
+BinaryOperator<Integer> b = (a, c) -> a + c;
+```
+
+Use
+
+```java
+System.out.println(b.apply(10, 20));
+```
+
+Output
+
+```
+30
+```
+
+---
+
+# Easy Memory Trick
+
+```
+Predicate
+
+↓
+
+Tests
+
+↓
+
+Returns boolean
+
+----------------
+
+Function
+
+↓
+
+Converts
+
+↓
+
+Returns value
+
+----------------
+
+Consumer
+
+↓
+
+Consumes
+
+↓
+
+Returns nothing
+
+----------------
+
+Supplier
+
+↓
+
+Supplies
+
+↓
+
+No input
+
+----------------
+
+UnaryOperator
+
+↓
+
+One input
+
+↓
+
+Same type output
+
+----------------
+
+BinaryOperator
+
+↓
+
+Two inputs
+
+↓
+
+Same type output
+```
+
+---
+
+# Real Project Mapping
+
+| Requirement             | Interface      |
+| ----------------------- | -------------- |
+| Check if user is active | Predicate      |
+| Convert Entity → DTO    | Function       |
+| Print logs              | Consumer       |
+| Generate OTP            | Supplier       |
+| Increase salary by 10%  | UnaryOperator  |
+| Add two salaries        | BinaryOperator |
+
+---
+
+# Interview Questions
+
+### Q1. What is a Functional Interface?
+
+An interface with exactly one abstract method that can be implemented using a lambda expression.
+
+---
+
+### Q2. Why does Lambda need a Functional Interface?
+
+Because Java must know exactly which single abstract method the lambda is implementing.
+
+---
+
+### Q3. Is `@FunctionalInterface` mandatory?
+
+No. It is optional, but recommended because it lets the compiler verify that the interface remains functional.
+
+---
+
+### Q4. Which built-in Functional Interface returns a boolean?
+
+**Answer:** `Predicate<T>` using the `test()` method.
+
+---
+
+### Q5. Which Functional Interface returns nothing?
+
+**Answer:** `Consumer<T>` using the `accept()` method.
+
+---
+
+### Q6. Which Functional Interface takes no input?
+
+**Answer:** `Supplier<T>` using the `get()` method.
+
+---
+
+### Q7. Difference between `Function` and `UnaryOperator`?
+
+| Function                                | UnaryOperator                           |
+| --------------------------------------- | --------------------------------------- |
+| Input and output types can be different | Input and output types must be the same |
+| Example: `String -> Integer`            | Example: `Integer -> Integer`           |
+
+---
+
+### Q8. Difference between `Function` and `Consumer`?
+
+| Function          | Consumer                 |
+| ----------------- | ------------------------ |
+| Returns a value   | Returns nothing (`void`) |
+| Method: `apply()` | Method: `accept()`       |
+
+---
+
+### Quick Revision Table
+
+| Interface           | Method     | Input | Output    | Example                            |
+| ------------------- | ---------- | ----- | --------- | ---------------------------------- |
+| `Predicate<T>`      | `test()`   | 1     | `boolean` | `n -> n > 0`                       |
+| `Function<T,R>`     | `apply()`  | 1     | `R`       | `str -> str.length()`              |
+| `Consumer<T>`       | `accept()` | 1     | `void`    | `name -> System.out.println(name)` |
+| `Supplier<T>`       | `get()`    | 0     | `T`       | `() -> "Hello"`                    |
+| `UnaryOperator<T>`  | `apply()`  | 1     | Same `T`  | `n -> n * n`                       |
+| `BinaryOperator<T>` | `apply()`  | 2     | Same `T`  | `(a, b) -> a + b`                  |
+
+This module is one of the highest-value Java 8 topics for interviews. Once you're comfortable with these six interfaces, the **Stream API** becomes much easier because streams rely heavily on them.
