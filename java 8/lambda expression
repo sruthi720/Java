@@ -1,0 +1,1201 @@
+Excellent. We'll study **Module 1 (Lambda Expressions)** in depth, from **beginner → interview level**.
+
+---
+
+# MODULE 1 – Lambda Expressions
+
+## Lesson Structure
+
+1. What is Lambda?
+2. Why was it introduced?
+3. Problems before Java 8
+4. Functional Programming
+5. Lambda Syntax
+6. How Lambda Works Internally
+7. Memory & Execution Flow
+8. Rules of Lambda
+9. Capturing Variables
+10. Real Project Examples
+11. Interview Questions
+12. Practice Problems
+
+---
+
+# 1. What is a Lambda Expression?
+
+A **Lambda Expression** is a **short way of writing the implementation of a method** for a **functional interface**.
+
+Think of it like this:
+
+Before Java 8:
+
+```java
+interface Greeting {
+    void greet();
+}
+
+class GreetingImpl implements Greeting {
+
+    @Override
+    public void greet() {
+        System.out.println("Hello");
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Greeting g = new GreetingImpl();
+        g.greet();
+
+    }
+
+}
+```
+
+There are many things to write:
+
+* Interface
+* Class
+* Override
+* Object creation
+
+Even though the actual work is only:
+
+```java
+System.out.println("Hello");
+```
+
+---
+
+Java 8 says:
+
+> "Why write all this extra code?"
+
+Instead write:
+
+```java
+Greeting g = () -> System.out.println("Hello");
+```
+
+Done!
+
+---
+
+# What exactly is happening?
+
+This line
+
+```java
+Greeting g = () -> System.out.println("Hello");
+```
+
+means
+
+> "Create an object of Greeting and implement its only abstract method using this code."
+
+---
+
+# 2. Why was Lambda Introduced?
+
+Java is an **Object-Oriented Language**.
+
+Everything required classes and objects.
+
+Suppose you wanted to sort employees.
+
+Before Java 8:
+
+```java
+Collections.sort(list, new Comparator<Employee>() {
+
+    @Override
+    public int compare(Employee e1, Employee e2) {
+        return e1.getSalary() - e2.getSalary();
+    }
+
+});
+```
+
+Lots of unnecessary code.
+
+---
+
+Java 8
+
+```java
+Collections.sort(list,
+    (e1, e2) -> e1.getSalary() - e2.getSalary());
+```
+
+Same work.
+
+Much smaller code.
+
+---
+
+# Problem Before Java 8
+
+Suppose you wanted to print numbers.
+
+Old Java:
+
+```java
+class Printer {
+
+    void print(int x) {
+        System.out.println(x);
+    }
+
+}
+```
+
+Need:
+
+* Class
+* Method
+* Object
+
+Just to print.
+
+Java 8 tries to reduce unnecessary code.
+
+---
+
+# 3. What is Functional Programming?
+
+Before understanding Lambda, understand this concept.
+
+There are two programming styles.
+
+## Object-Oriented Programming
+
+Everything revolves around:
+
+```
+Class
+
+↓
+
+Object
+
+↓
+
+Method
+```
+
+Example
+
+```java
+Car car = new Car();
+
+car.start();
+```
+
+---
+
+## Functional Programming
+
+Everything revolves around:
+
+```
+Function
+
+↓
+
+Pass Function
+
+↓
+
+Execute Function
+```
+
+Instead of passing objects...
+
+You pass behavior.
+
+Example
+
+Instead of saying
+
+```
+Use this Printer object
+```
+
+You say
+
+```
+Use this print logic.
+```
+
+That print logic is the Lambda.
+
+---
+
+# 4. Lambda Syntax
+
+General syntax
+
+```java
+(parameters) -> expression
+```
+
+or
+
+```java
+(parameters) -> {
+
+    statements
+
+}
+```
+
+Think of it like this
+
+```
+Input
+
+↓
+
+Process
+
+↓
+
+Output
+```
+
+The arrow means
+
+```
+takes this
+
+↓
+
+does this
+```
+
+---
+
+# Case 1 No Parameters
+
+```java
+() -> System.out.println("Hello")
+```
+
+Let's understand.
+
+```
+()
+
+↓
+
+No inputs
+
+↓
+
+->
+
+↓
+
+Execute this statement
+```
+
+Equivalent method
+
+```java
+void greet() {
+
+    System.out.println("Hello");
+
+}
+```
+
+---
+
+# Case 2 One Parameter
+
+```java
+name -> System.out.println(name);
+```
+
+Equivalent
+
+```java
+void print(String name){
+
+    System.out.println(name);
+
+}
+```
+
+Notice
+
+No datatype required.
+
+Java already knows.
+
+---
+
+# How?
+
+Suppose interface
+
+```java
+interface Printer{
+
+    void print(String name);
+
+}
+```
+
+Compiler already knows
+
+```
+print()
+
+↓
+
+takes String
+
+↓
+
+therefore
+
+name is String
+```
+
+So we don't need
+
+```java
+(String name)
+```
+
+Although this is also correct.
+
+---
+
+# Case 3 Two Parameters
+
+```java
+(a,b) -> a+b
+```
+
+Equivalent
+
+```java
+int add(int a,int b){
+
+    return a+b;
+
+}
+```
+
+---
+
+# Why no return?
+
+Many beginners ask this.
+
+Lambda
+
+```java
+(a,b)->a+b
+```
+
+looks incomplete.
+
+Actually Java automatically adds
+
+```java
+return
+```
+
+So internally
+
+```java
+(a,b)->{
+
+    return a+b;
+
+}
+```
+
+---
+
+# But if we write braces?
+
+Then
+
+```java
+(a,b)->{
+
+    return a+b;
+
+}
+```
+
+Return becomes mandatory.
+
+Wrong
+
+```java
+(a,b)->{
+
+    a+b;
+
+}
+```
+
+Compilation Error
+
+---
+
+# 5. Parameter Rules
+
+## No parameter
+
+```java
+()->System.out.println("Hi");
+```
+
+---
+
+## One parameter
+
+No brackets needed
+
+```java
+x->x*x
+```
+
+Also valid
+
+```java
+(x)->x*x
+```
+
+Both correct.
+
+---
+
+## Two parameters
+
+Brackets compulsory.
+
+Correct
+
+```java
+(a,b)->a+b
+```
+
+Wrong
+
+```java
+a,b->a+b
+```
+
+---
+
+# 6. Where Can Lambda Be Used?
+
+Only Functional Interface.
+
+Correct
+
+```java
+interface Calculator{
+
+    int add(int a,int b);
+
+}
+```
+
+Lambda
+
+```java
+Calculator c=(a,b)->a+b;
+```
+
+Works.
+
+---
+
+Wrong
+
+```java
+interface Test{
+
+    void print();
+
+    void show();
+
+}
+```
+
+Lambda
+
+```java
+Test t=()->System.out.println("Hi");
+```
+
+Error.
+
+Why?
+
+Because Java doesn't know
+
+```
+Should I implement
+
+print()
+
+OR
+
+show()?
+```
+
+---
+
+# 7. How Java Executes Lambda (Internal Logic)
+
+This is one of the most important interview concepts.
+
+Suppose
+
+```java
+interface Calculator{
+
+    int add(int a,int b);
+
+}
+```
+
+Lambda
+
+```java
+Calculator c=(a,b)->a+b;
+```
+
+Many beginners think:
+
+> "Where is the class?"
+
+The compiler creates it behind the scenes.
+
+Imagine Java creates something like:
+
+```java
+class TempCalculator implements Calculator{
+
+    @Override
+    public int add(int a,int b){
+
+        return a+b;
+
+    }
+
+}
+```
+
+Then it creates the object:
+
+```java
+Calculator c=new TempCalculator();
+```
+
+This generated implementation is hidden from you, which is why lambda syntax is so concise.
+
+---
+
+# 8. Memory Representation
+
+Imagine
+
+```java
+Calculator c=(a,b)->a+b;
+```
+
+Memory looks like
+
+```
+STACK
+
+c
+
+↓
+
+reference
+
+--------------------
+
+HEAP
+
+Generated Lambda Object
+
+↓
+
+add()
+
+↓
+
+return a+b
+```
+
+Just like normal objects, the lambda implementation is represented by an object at runtime.
+
+---
+
+# 9. Real Project Example
+
+Suppose in your Spring Boot project you have a list of employee names.
+
+Without Lambda
+
+```java
+for(String name:list){
+
+    System.out.println(name);
+
+}
+```
+
+With Lambda
+
+```java
+list.forEach(name->System.out.println(name));
+```
+
+Much cleaner.
+
+---
+
+Another example
+
+Sorting Employees
+
+```java
+employees.sort(
+    (e1,e2)->e1.getSalary()-e2.getSalary()
+);
+```
+
+---
+
+# 10. Common Interview Questions
+
+### Q1. What is Lambda?
+
+**Answer:**
+A lambda expression is a concise way to provide the implementation of the single abstract method of a functional interface. It reduces boilerplate code and supports functional programming.
+
+---
+
+### Q2. Why was Lambda introduced?
+
+**Answer:**
+To reduce anonymous class code, improve readability, and enable functional programming features such as the Stream API.
+
+---
+
+### Q3. Can Lambda be used with a class?
+
+**Answer:**
+No. Lambda expressions can only implement the single abstract method of a functional interface, not a class.
+
+---
+
+### Q4. Why does Lambda require a Functional Interface?
+
+**Answer:**
+Because Java must know exactly which abstract method the lambda is implementing. If there were multiple abstract methods, the compiler could not determine the target method.
+
+---
+
+### Q5. Does Lambda create an object?
+
+**Answer:**
+Yes. At runtime, Java creates an object that represents the lambda implementation, but the creation is handled internally by the JVM.
+
+---
+
+# Practice Questions
+
+Try writing these yourself:
+
+1. Print `"Hello Java 8"` using a lambda.
+2. Add two numbers using a lambda.
+3. Return the square of a number using a lambda.
+4. Check if a number is positive using a lambda.
+5. Sort a list of integers using a lambda expression.
+
+### Next Lesson (Module 1 – Part 2)
+
+We'll cover:
+
+* **Anonymous Inner Classes vs Lambda Expressions**
+* **`this` keyword in Lambdas**
+* **Variable capture (effectively final)**
+* **How lambdas differ from anonymous classes**
+* **Common mistakes and interview questions**
+
+These are frequently discussed in Java 8 interviews because they test your understanding beyond basic syntax.
+
+
+
+
+  ------------------------------------------------------------------------------------------------------------------------------
+
+  Perfect. For interviews, you should be able to **write lambda expressions from normal methods**. Below are beginner-to-intermediate practice questions with answers.
+
+---
+
+# Lambda Writing Practice Questions
+
+The goal is to convert a **normal method** into a **lambda expression**.
+
+---
+
+# Question 1 (Very Easy)
+
+### Interface
+
+```java
+interface Greeting {
+    void sayHello();
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+Greeting g = () -> System.out.println("Hello");
+```
+
+---
+
+# Question 2
+
+### Interface
+
+```java
+interface Printer {
+    void print(String name);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+Printer p = name -> System.out.println(name);
+```
+
+or
+
+```java
+Printer p = (name) -> System.out.println(name);
+```
+
+Both are correct.
+
+---
+
+# Question 3
+
+### Interface
+
+```java
+interface Calculator {
+    int add(int a, int b);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+Calculator c = (a, b) -> a + b;
+```
+
+---
+
+# Question 4
+
+### Interface
+
+```java
+interface Square {
+    int square(int n);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+Square s = n -> n * n;
+```
+
+---
+
+# Question 5
+
+### Interface
+
+```java
+interface EvenNumber {
+    boolean check(int n);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+EvenNumber e = n -> n % 2 == 0;
+```
+
+---
+
+# Question 6
+
+### Interface
+
+```java
+interface MaxNumber {
+    int max(int a, int b);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+MaxNumber m = (a, b) -> a > b ? a : b;
+```
+
+---
+
+# Question 7
+
+### Interface
+
+```java
+interface StringLength {
+    int length(String str);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+StringLength l = str -> str.length();
+```
+
+---
+
+# Question 8
+
+### Interface
+
+```java
+interface UpperCase {
+    String convert(String str);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+UpperCase u = str -> str.toUpperCase();
+```
+
+---
+
+# Question 9
+
+### Interface
+
+```java
+interface LowerCase {
+    String convert(String str);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+LowerCase l = str -> str.toLowerCase();
+```
+
+---
+
+# Question 10
+
+### Interface
+
+```java
+interface Voting {
+    boolean eligible(int age);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+Voting v = age -> age >= 18;
+```
+
+---
+
+# Question 11
+
+### Interface
+
+```java
+interface Message {
+    String getMessage();
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+Message m = () -> "Welcome";
+```
+
+---
+
+# Question 12
+
+### Interface
+
+```java
+interface Area {
+    double calculate(double radius);
+}
+```
+
+Write a lambda to calculate the area of a circle.
+
+### Answer
+
+```java
+Area a = radius -> 3.14 * radius * radius;
+```
+
+---
+
+# Question 13
+
+### Interface
+
+```java
+interface Multiply {
+    int multiply(int a, int b);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+Multiply m = (a, b) -> a * b;
+```
+
+---
+
+# Question 14
+
+### Interface
+
+```java
+interface Divide {
+    double divide(double a, double b);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+Divide d = (a, b) -> a / b;
+```
+
+---
+
+# Question 15
+
+### Interface
+
+```java
+interface FullName {
+    String combine(String first, String last);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+FullName f = (first, last) -> first + " " + last;
+```
+
+---
+
+# Question 16
+
+### Interface
+
+```java
+interface NumberCheck {
+    boolean isPositive(int n);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+NumberCheck n = num -> num > 0;
+```
+
+---
+
+# Question 17
+
+### Interface
+
+```java
+interface CharacterCheck {
+    boolean isVowel(char ch);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+CharacterCheck c = ch ->
+        ch == 'a' ||
+        ch == 'e' ||
+        ch == 'i' ||
+        ch == 'o' ||
+        ch == 'u';
+```
+
+---
+
+# Question 18
+
+### Interface
+
+```java
+interface Discount {
+    double apply(double price);
+}
+```
+
+Apply a 10% discount.
+
+### Answer
+
+```java
+Discount d = price -> price * 0.9;
+```
+
+---
+
+# Question 19
+
+### Interface
+
+```java
+interface ReverseString {
+    String reverse(String str);
+}
+```
+
+Write a lambda.
+
+### Answer
+
+```java
+ReverseString r = str ->
+        new StringBuilder(str).reverse().toString();
+```
+
+---
+
+# Question 20 (Interview Favorite)
+
+### Interface
+
+```java
+interface Compare {
+    int compare(int a, int b);
+}
+```
+
+Return:
+
+* 1 if a > b
+* -1 if a < b
+* 0 if equal
+
+### Answer
+
+```java
+Compare c = (a, b) -> {
+
+    if (a > b)
+        return 1;
+
+    if (a < b)
+        return -1;
+
+    return 0;
+};
+```
+
+---
+
+# Bonus Interview Questions
+
+Try these **without looking at the answers**:
+
+1. Return the cube of a number.
+2. Check whether a string is empty.
+3. Return the smaller of two numbers.
+4. Find whether a year is a leap year.
+5. Find the absolute value of a number.
+6. Check whether a string starts with `"Java"`.
+7. Return the last character of a string.
+8. Check whether a number is divisible by both 3 and 5.
+9. Calculate simple interest.
+10. Check whether a string is a palindrome.
+
+These exercises will make you comfortable with lambda syntax before moving on to Java 8's built-in functional interfaces like `Predicate`, `Function`, `Consumer`, and `Supplier`.
