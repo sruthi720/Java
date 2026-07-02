@@ -1,0 +1,729 @@
+Perfect. Since you've already covered **Module 1 (Lambda Expressions)** and **Module 2 (Functional Interfaces)**, let's move to **Module 3 – Method References**, which is one of the easiest yet frequently asked Java 8 interview topics.
+
+---
+
+# Module 3 — Method References ⭐⭐⭐⭐
+
+## 1. What is Method Reference?
+
+A **Method Reference** is a shorter and cleaner way of writing a lambda expression when the lambda simply calls an existing method.
+
+Instead of writing:
+
+```java
+name -> System.out.println(name)
+```
+
+You can write:
+
+```java
+System.out::println
+```
+
+The `::` operator is called the **method reference operator**.
+
+---
+
+## 2. Why was it introduced?
+
+Before Java 8
+
+```java
+Collections.sort(list, new Comparator<String>() {
+    @Override
+    public int compare(String a, String b) {
+        return a.compareTo(b);
+    }
+});
+```
+
+Java 8 Lambda
+
+```java
+Collections.sort(list, (a, b) -> a.compareTo(b));
+```
+
+Method Reference
+
+```java
+Collections.sort(list, String::compareTo);
+```
+
+Each step reduces unnecessary code while keeping the same behavior.
+
+---
+
+# 3. Problem it solves
+
+Without Method Reference
+
+```java
+list.forEach(name -> System.out.println(name));
+```
+
+The lambda isn't doing any extra work—it simply calls an existing method.
+
+Method Reference
+
+```java
+list.forEach(System.out::println);
+```
+
+Cleaner.
+
+More readable.
+
+Less code.
+
+---
+
+# 4. Internal Working
+
+Consider:
+
+```java
+list.forEach(System.out::println);
+```
+
+`forEach()` expects a `Consumer<T>`.
+
+Consumer has:
+
+```java
+void accept(T t);
+```
+
+Java internally converts
+
+```java
+System.out::println
+```
+
+into
+
+```java
+name -> System.out.println(name)
+```
+
+The compiler matches:
+
+```
+Consumer.accept(name)
+↓
+
+System.out.println(name)
+```
+
+So Method Reference is simply **syntactic sugar** for a compatible lambda.
+
+---
+
+# 5. Syntax
+
+General syntax
+
+```java
+ClassName::methodName
+```
+
+or
+
+```java
+object::methodName
+```
+
+or
+
+```java
+ClassName::new
+```
+
+---
+
+# Types of Method References
+
+There are **4 types**.
+
+Interviewers usually ask for all four.
+
+| Type                                 | Example               |
+| ------------------------------------ | --------------------- |
+| Static Method                        | Class::staticMethod   |
+| Instance Method of Particular Object | object::method        |
+| Instance Method of Arbitrary Object  | Class::instanceMethod |
+| Constructor Reference                | Class::new            |
+
+---
+
+# Type 1 — Static Method Reference ⭐⭐⭐⭐⭐
+
+Example
+
+```java
+class MathUtil {
+
+    static int square(int x) {
+        return x * x;
+    }
+
+}
+```
+
+Lambda
+
+```java
+Function<Integer, Integer> f =
+        x -> MathUtil.square(x);
+```
+
+Method Reference
+
+```java
+Function<Integer, Integer> f =
+        MathUtil::square;
+```
+
+Calling
+
+```java
+System.out.println(f.apply(5));
+```
+
+Output
+
+```
+25
+```
+
+---
+
+### How Java Executes It
+
+When
+
+```java
+f.apply(5)
+```
+
+is called
+
+Compiler internally does
+
+```
+MathUtil.square(5)
+```
+
+Memory Flow
+
+```
+Function.apply(5)
+
+↓
+
+MathUtil.square(5)
+
+↓
+
+returns 25
+```
+
+---
+
+# Another Example
+
+```java
+class Demo {
+
+    static void greet(String name) {
+        System.out.println("Hello " + name);
+    }
+
+}
+```
+
+Lambda
+
+```java
+Consumer<String> c =
+        name -> Demo.greet(name);
+```
+
+Method Reference
+
+```java
+Consumer<String> c =
+        Demo::greet;
+```
+
+Output
+
+```
+Hello John
+```
+
+---
+
+# Type 2 — Instance Method Reference of Particular Object ⭐⭐⭐⭐
+
+Suppose
+
+```java
+class Printer {
+
+    void print(String s) {
+        System.out.println(s);
+    }
+
+}
+```
+
+Create object
+
+```java
+Printer p = new Printer();
+```
+
+Lambda
+
+```java
+Consumer<String> c =
+        s -> p.print(s);
+```
+
+Method Reference
+
+```java
+Consumer<String> c =
+        p::print;
+```
+
+Call
+
+```java
+c.accept("Java");
+```
+
+Output
+
+```
+Java
+```
+
+---
+
+### Internal Working
+
+Compiler converts
+
+```java
+p::print
+```
+
+into
+
+```java
+s -> p.print(s)
+```
+
+---
+
+# Type 3 — Instance Method Reference of Arbitrary Object ⭐⭐⭐⭐⭐
+
+This confuses almost everyone initially.
+
+Suppose
+
+```java
+List<String> list =
+        Arrays.asList("Dog", "Cat", "Apple");
+```
+
+Sorting
+
+Lambda
+
+```java
+list.sort((a, b) -> a.compareTo(b));
+```
+
+Method Reference
+
+```java
+list.sort(String::compareTo);
+```
+
+People ask:
+
+> Where is the object?
+
+Java creates it automatically.
+
+When sorting,
+
+```
+compare(a,b)
+```
+
+becomes
+
+```
+a.compareTo(b)
+```
+
+Compiler understands
+
+```
+String::compareTo
+
+↓
+
+first parameter becomes object
+
+↓
+
+second parameter becomes argument
+```
+
+So
+
+```
+(a,b)->a.compareTo(b)
+```
+
+is equivalent to
+
+```
+String::compareTo
+```
+
+---
+
+### Another Example
+
+Convert to lowercase
+
+Lambda
+
+```java
+list.stream()
+    .map(s -> s.toLowerCase());
+```
+
+Method Reference
+
+```java
+list.stream()
+    .map(String::toLowerCase);
+```
+
+Internally
+
+```
+String::toLowerCase
+
+↓
+
+s -> s.toLowerCase()
+```
+
+---
+
+# Type 4 — Constructor Reference ⭐⭐⭐⭐⭐
+
+Instead of calling constructor manually.
+
+Class
+
+```java
+class Employee {
+
+    Employee() {
+        System.out.println("Created");
+    }
+
+}
+```
+
+Lambda
+
+```java
+Supplier<Employee> s =
+        () -> new Employee();
+```
+
+Method Reference
+
+```java
+Supplier<Employee> s =
+        Employee::new;
+```
+
+Call
+
+```java
+Employee e = s.get();
+```
+
+Output
+
+```
+Created
+```
+
+---
+
+Another example
+
+```java
+Function<String, Employee> f =
+        Employee::new;
+```
+
+Constructor
+
+```java
+Employee(String name)
+```
+
+Calling
+
+```java
+Employee e = f.apply("John");
+```
+
+Internally
+
+```
+new Employee("John")
+```
+
+---
+
+# Memory / Execution Flow
+
+Suppose
+
+```java
+list.forEach(System.out::println);
+```
+
+Flow
+
+```
+ArrayList
+
+↓
+
+Stream
+
+↓
+
+forEach()
+
+↓
+
+Consumer.accept(item)
+
+↓
+
+System.out.println(item)
+
+↓
+
+Console
+```
+
+Method Reference does **not** create a new method or object. It simply points to an existing method that matches the functional interface.
+
+---
+
+# Real Project Usage
+
+### Logging
+
+```java
+employees.forEach(logger::info);
+```
+
+Instead of
+
+```java
+employees.forEach(e -> logger.info(e));
+```
+
+---
+
+### Printing Data
+
+```java
+list.forEach(System.out::println);
+```
+
+---
+
+### Entity Mapping
+
+```java
+employees.stream()
+         .map(EmployeeDto::new)
+         .toList();
+```
+
+If `EmployeeDto` has a constructor that accepts an `Employee`, each stream element is passed into that constructor.
+
+---
+
+### Convert to Uppercase
+
+```java
+names.stream()
+     .map(String::toUpperCase)
+     .toList();
+```
+
+---
+
+### Sorting
+
+```java
+names.sort(String::compareToIgnoreCase);
+```
+
+---
+
+# Interview Questions
+
+### Q1. What is Method Reference?
+
+A Method Reference is a shorthand notation for a lambda expression that directly calls an existing method. It uses the `::` operator and improves readability without changing functionality.
+
+---
+
+### Q2. Is Method Reference faster than Lambda?
+
+No.
+
+Both compile to similar bytecode and have comparable performance. Method References mainly improve readability and reduce boilerplate.
+
+---
+
+### Q3. Can every lambda be replaced by Method Reference?
+
+No.
+
+Only lambdas that **simply invoke an existing method** without adding extra logic can be replaced.
+
+Example that **can** be replaced:
+
+```java
+s -> s.toUpperCase()
+```
+
+↓
+
+```java
+String::toUpperCase
+```
+
+Example that **cannot** be replaced:
+
+```java
+s -> s.toUpperCase() + "!"
+```
+
+This adds extra logic, so it cannot be expressed as a simple method reference.
+
+---
+
+### Q4. What are the four types of Method References?
+
+1. Static Method Reference
+2. Instance Method Reference of a Particular Object
+3. Instance Method Reference of an Arbitrary Object of a Particular Type
+4. Constructor Reference
+
+---
+
+### Q5. What is the difference between Lambda and Method Reference?
+
+| Lambda                   | Method Reference                   |
+| ------------------------ | ---------------------------------- |
+| Can contain custom logic | Only references an existing method |
+| Uses `->`                | Uses `::`                          |
+| More flexible            | More concise when applicable       |
+
+---
+
+# Coding Problems
+
+### Problem 1: Print a list
+
+Using a lambda:
+
+```java
+List<String> names = Arrays.asList("Alice", "Bob", "Charlie");
+names.forEach(name -> System.out.println(name));
+```
+
+Rewrite it using a method reference.
+
+---
+
+### Problem 2: Convert to uppercase
+
+Using a lambda:
+
+```java
+List<String> names = Arrays.asList("java", "spring", "boot");
+List<String> result = names.stream()
+                           .map(s -> s.toUpperCase())
+                           .toList();
+```
+
+Rewrite it using a method reference.
+
+---
+
+### Problem 3: Sort a list
+
+Using a lambda:
+
+```java
+List<String> names = Arrays.asList("Dog", "Apple", "Cat");
+names.sort((a, b) -> a.compareTo(b));
+```
+
+Rewrite it using a method reference.
+
+---
+
+### Problem 4: Constructor Reference
+
+Given:
+
+```java
+class Student {
+    Student(String name) {
+        System.out.println(name);
+    }
+}
+```
+
+Create a `Function<String, Student>` using a constructor reference.
+
+---
+
+## Interview Summary (Must Remember)
+
+* Method Reference is **syntactic sugar** for compatible lambda expressions.
+* Uses the `::` operator.
+* It works only when the lambda directly calls an existing method.
+* There are **4 types**:
+
+  1. Static Method Reference
+  2. Instance Method Reference of a Particular Object
+  3. Instance Method Reference of an Arbitrary Object
+  4. Constructor Reference
+* The compiler converts a method reference into an implementation of the target functional interface's single abstract method.
+
+Once you're comfortable with Method References, the next module—**Stream API**—will be much easier because you'll see method references used extensively with operations like `map`, `filter`, `sorted`, and `forEach`.
